@@ -1,9 +1,9 @@
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 import yt_dlp
 import os
 
-TOKEN = "token"
+TOKEN = "your-telegram-bot-token"
 
 def download_video(url):
     ydl_opts = {
@@ -14,29 +14,28 @@ def download_video(url):
         ydl.download([url])
     return "video.mp4"
 
-def start(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text("👋 សួស្តី! ផ្ញើលីង YouTube មកខ្ញុំដើម្បីទាញយកវីដេអូ 📥")
+async def start(update: Update, context: CallbackContext):
+    await update.message.reply_text("👋 សួស្តី! ផ្ញើលីង YouTube មកខ្ញុំដើម្បីទាញយកវីដេអូ 📥")
 
-def download(update: Update, context: CallbackContext) -> None:
+async def download(update: Update, context: CallbackContext):
     url = update.message.text
-    update.message.reply_text("🔄 กำลังดาวน์โหลด...")
+    await update.message.reply_text("🔄 กำลังดาวน์โหลด...")
     
     try:
         video_path = download_video(url)
-        update.message.reply_video(video=open(video_path, 'rb'))
+        await update.message.reply_video(video=open(video_path, 'rb'))
         os.remove(video_path)
     except Exception as e:
-        update.message.reply_text(f"❌ មានបញ្ហា: {e}")
+        await update.message.reply_text(f"❌ មានបញ្ហា: {e}")
 
 def main():
-    updater = Updater(TOKEN, use_context=True)
-    dp = updater.dispatcher
+    app = Application.builder().token(TOKEN).build()
 
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, download))
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, download))
 
-    updater.start_polling()
-    updater.idle()
+    print("🤖 Bot is running...")
+    app.run_polling()
 
-if name == 'main':
+if __name__ == "__main__":
     main()
