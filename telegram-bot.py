@@ -3,7 +3,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 import yt_dlp
 import os
 
-TOKEN = "7799417641:AAHx8Yd6zpJ0Bw2CMXnfsBhzUy-2Om2poEU"
+TOKEN = "token"
 
 def download_video(url):
     ydl_opts = {
